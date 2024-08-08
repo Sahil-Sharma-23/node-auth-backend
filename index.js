@@ -25,6 +25,24 @@ app.get("/users", async (req, res) => {
   }
 })
 
+// Create new user in DB
+app.post("/user", async (req, res) => {
+  const { firstName, lastName, email, password } = req.body;
+
+  try {
+    const result = await pool.query(`INSERT INTO users (first_Name, last_name, email, password)
+      VALUES ('${firstName}', '${lastName}', '${email}', '${password}')`)
+    console.log("Result: ", result);
+
+    res.status(200).send(result)
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      message: "Internal server error."
+    })
+  }
+})
+
 app.listen(process.env.SERVER_PORT, () => {
   return ("Listening at Port 8000")
 })
