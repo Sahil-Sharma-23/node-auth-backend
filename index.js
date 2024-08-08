@@ -2,9 +2,17 @@ const express = require("express")
 const app = express()
 const pool = require("./db")
 require('dotenv').config()  // Use env variables 'process.env.VAR'
+const fs = require('fs')
 
 // Middleware
 app.use(express.json()) // Allow app to use JSON
+
+// Custom middleware to log requests served
+app.use((req, res, next) => {
+  fs.appendFile("Log.txt", `${Date.now()}: ${req.method} : ${req.path}\n`, (err, data) => {
+    next();
+  })
+})
 
 // Routes
 app.get("/health-check", (req, res) => {
