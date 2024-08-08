@@ -1,7 +1,9 @@
 const express = require("express")
 const app = express()
 require('dotenv').config()  // Use env variables 'process.env.VAR'
+
 const userRouter = require("./routes/user")
+
 const { logReqRes } = require("./middlewares")
 
 // Middlewares
