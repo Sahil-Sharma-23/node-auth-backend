@@ -8,7 +8,9 @@ const { logReqRes } = require("./middlewares")
 
 // Middlewares
 app.use(express.json()) // Allow app to use JSON
-app.use(logReqRes("Log.txt"))
+if (process.env.ENABLE_FILE_BASED_LOGS) { // Only use if the flag is set to true
+  app.use(logReqRes("Log.txt"))
+}
 
 // Health check route
 app.get("/health-check", (req, res) => {
