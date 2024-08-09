@@ -5,7 +5,7 @@ require('dotenv').config()  // Use env variables 'process.env.VAR'
 const userRouter = require("./routes/user")
 const healthRouter = require("./routes/health")
 
-const { logReqRes } = require("./middlewares")
+const { logReqRes, authorization } = require("./middlewares")
 
 // Middlewares
 app.use(express.json()) // Allow app to use JSON
