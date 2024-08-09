@@ -1,5 +1,7 @@
 CREATE DATABASE auth;
 
+CREATE TYPE user_role AS ENUM ('user', 'admin', 'sadmin');
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY, -- Auto-incrementing ID column
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the record is created
@@ -14,4 +16,5 @@ CREATE TABLE users (
     phone_number VARCHAR(20), -- Optional phone number
     profile_picture TEXT, -- URL to the profile picture
     gender VARCHAR(50) -- Gender of the user
+    role user_role NOT NULL DEFAULT 'user'
 );
