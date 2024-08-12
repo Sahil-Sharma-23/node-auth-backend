@@ -3,9 +3,9 @@ const app = express()
 require('dotenv').config()  // Use env variables 'process.env.VAR'
 const cookieParser = require('cookie-parser');
 
-const userRouter = require("./routes/user")
-const healthRouter = require("./routes/health")
-const authRouter = require("./routes/auth")
+const userRouter = require("./routes/userRouter")
+const healthRouter = require("./routes/healthRouter")
+const authRouter = require("./routes/authRouter")
 
 const { logReqRes } = require("./middlewares")
 

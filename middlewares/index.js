@@ -13,24 +13,24 @@ function logReqRes(fileName) {
   }
 }
 
-function authorization() {
-  return (req, res, next) => {
-    const token = req.header('Authorization')
-    if (!token) return res.status(401).json({ error: "Access denied" })
+// function authorization() {
+//   return (req, res, next) => {
+//     const token = req.header('Authorization')
+//     if (!token) return res.status(401).json({ error: "Access denied" })
 
-    try {
-      const tokenDecoded = jwt.verify(token, jwtSecret)
-      // Add userId to the req object
-      req.userId = tokenDecoded.userId
-      next()
-    } catch (err) {
-      console.error(err); // DEBUG
-      res.status(500).send({ message: "Internal server error" })
-    }
-  }
-}
+//     try {
+//       const tokenDecoded = jwt.verify(token, jwtSecret)
+//       // Add userId to the req object
+//       req.userId = tokenDecoded.userId
+//       next()
+//     } catch (err) {
+//       console.error(err); // DEBUG
+//       res.status(500).send({ message: "Internal server error" })
+//     }
+//   }
+// }
 
 module.exports = {
   logReqRes,
-  authorization
+  // authorization
 }

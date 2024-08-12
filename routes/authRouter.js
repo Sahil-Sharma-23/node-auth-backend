@@ -2,7 +2,7 @@ const express = require("express")
 const {
   handleRegisterNewUser,
   handleLoginUser
-} = require("../controllers/auth")
+} = require("../controllers/authController")
 const router = express.Router()
 
 router.post("/signup", handleRegisterNewUser)
