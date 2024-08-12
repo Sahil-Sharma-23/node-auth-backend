@@ -12,7 +12,6 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE, -- Email of the user (must be unique)
     verified BOOLEAN DEFAULT FALSE, -- Whether the user's email is verified
     password_hash TEXT NOT NULL, -- Hashed password
-    password_salt TEXT NOT NULL, -- Password salt
     phone_number VARCHAR(20), -- Optional phone number
     profile_picture TEXT, -- URL to the profile picture
     gender VARCHAR(50) -- Gender of the user

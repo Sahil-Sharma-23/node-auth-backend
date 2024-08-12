@@ -1,23 +1,15 @@
-const bcrypt = require("bcrypt")
-const saltRounds = 10;
+require('dotenv').config()  // Allow to use env variables
+const { createHmac } = require('node:crypto')
+const secret = process.env.HMAC_SECRET
 
-async function checkPassword(password, passwordHash, passwordSalt) {
-  const hash = await bcrypt.hash(password, passwordSalt)
-  console.log("Match : ", hash === passwordHash); // DEBUG
-  if (hash === passwordHash) {
-    return true
-  }
-  return false;
+async function matchPassword(password, passwordHash) {
+  const newPasswordHash = createHmac('sha256', secret).update(password).digest('hex')
+  return newPasswordHash === passwordHash
 }
 
-async function hashPassword(password) {
-  const salt = await bcrypt.genSalt(saltRounds)
-  const hashedPassword = await bcrypt.hash(password, salt)
-
-  return {
-    salt: salt,
-    hash: hashedPassword
-  }
+async function encryptPassword(password) {
+  const hash = createHmac('sha256', secret).update(password).digest('hex')
+  return hash
 }
 
-module.exports = { checkPassword, hashPassword }
+module.exports = { matchPassword, encryptPassword }
