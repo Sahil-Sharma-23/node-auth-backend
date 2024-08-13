@@ -1,5 +1,4 @@
 const pool = require("../db")
-const { createHmac } = require("node:crypto")
 const {
   validateEmail,
   validatePassword,
@@ -11,6 +10,7 @@ const jwt = require("jsonwebtoken")
 const { encryptPassword, matchPassword } = require("../utils/authUtils")
 
 const tableName = process.env.TABLE_NAME
+const jwtSecret = process.env.JWT_SECRET_KEY
 
 async function handleLoginUser(req, res) {
   const { email, password } = req.body
@@ -29,12 +29,10 @@ async function handleLoginUser(req, res) {
 
   try {
     const result = await pool.query(`
-        SELECT id, email, password_hash
+        SELECT id, email, password_hash, role
         FROM ${tableName}
         WHERE email = '${email}'
       `)
-
-    console.log("Logging result : ", result); // DEBUG
 
     // Return no such user exist if no rows returned
     if (result.rows.length === 0) {
@@ -44,10 +42,29 @@ async function handleLoginUser(req, res) {
     }
 
     // Verify if the password matches the password in the DB
-    const isPasswordCorrect = await matchPassword(password, result.rows[0].password_hash)
-    return res.status(200).send({
-      message: isPasswordCorrect
+    const isPasswordCorrect = matchPassword(password, result.rows[0].password_hash)
+    if (!isPasswordCorrect) {
+      return res.status(401).send({
+        message: 'Password does not match... TRY AGAIN!'
+      })
+    }
+    // TODO: create and store the JWT token in cookie store
+    const payload = {
+      userId: result.rows[0].id,
+      role: result.rows[0].role,
+      email: result.rows[0].email
+    }
+    const token = jwt.sign(payload, jwtSecret)
+
+    // Store the token in cookies
+    res.cookie("token", token, {
+      httpOnly: false,
+      // maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'None', // Required if your frontend is on a different origin
+      secure: true, // Must be true if sameSite is 'None'
     })
+
+    return res.status(200).send({ token })
   } catch (err) {
     console.error(err);
     return res.status(500).send({
@@ -55,14 +72,6 @@ async function handleLoginUser(req, res) {
     })
   }
 
-  // TODO: create and store the JWT token in cookie store
-  // const token = jwt.sign({
-  //   id: user.id,
-  //   email: user.email,
-  //   role: user.role
-  // }, jwtSecret)
-  // console.log("Token generated: ", token);  // DEBUG
-  // res.cookie('token', token, { maxAge: 900000, httpOnly: true });
 }
 
 async function handleRegisterNewUser(req, res) {
@@ -79,22 +88,22 @@ async function handleRegisterNewUser(req, res) {
 
   // Add validation for all fields
   if (!validateUsername(username)) {
-    res.status(300).send({
+    return res.status(300).send({
       message: "Invalid username."
     })
   }
   if (!validatePassword(password)) {
-    res.status(300).send({
+    return res.status(300).send({
       message: "Invalid password."
     })
   }
   if (!validateEmail(email)) {
-    res.status(300).send({
+    return res.status(300).send({
       message: "Invalid email."
     })
   }
   if (phoneNumber !== "" && !validatePhoneNumber(phoneNumber)) {
-    res.status(300).send({
+    return res.status(300).send({
       message: "Invalid phone number."
     })
   }
@@ -111,10 +120,10 @@ async function handleRegisterNewUser(req, res) {
         ('${firstName}', '${lastName}', '${username}', '${email}', '${hash}', '${phoneNumber}', '${profilePicture}', '${gender}')
     `)
 
-    res.status(200).send(result)
+    return res.status(200).send(result)
   } catch (err) {
     console.error(err); // DEBUG
-    res.status(500).send({
+    return res.status(500).send({
       message: err.detail
     })
   }

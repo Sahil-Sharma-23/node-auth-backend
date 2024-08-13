@@ -2,7 +2,7 @@ require('dotenv').config()  // Allow to use env variables
 const { createHmac } = require('node:crypto')
 const secret = process.env.HMAC_SECRET
 
-async function matchPassword(password, passwordHash) {
+function matchPassword(password, passwordHash) {
   const newPasswordHash = createHmac('sha256', secret).update(password).digest('hex')
   return newPasswordHash === passwordHash
 }
